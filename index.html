@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Reduce imágenes en tu navegador y obtén recomendaciones de tamaño claras para cualquier archivo."
+    />
+    <title>ReduceSize — menos peso, misma intención</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Inicio ReduceSize">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 28 28" role="img">
+            <path d="M7 4h11l4 4v16H7z" />
+            <path d="M18 4v5h5M11 14h8M11 18h6" />
+          </svg>
+        </span>
+        <span>Reduce<span>Size</span></span>
+      </a>
+      <div class="privacy-pill">
+        <span class="privacy-dot"></span>
+        MODO LOCAL · 100% PRIVADO
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow"><span></span> SISTEMA DE COMPRESIÓN // ONLINE <span></span></div>
+        <h1>Archivos más ligeros.<br /><em>Calidad que se queda.</em></h1>
+        <p class="hero-copy">
+          Reduce el peso de imágenes <strong>JPG, PNG y WEBP</strong> directamente en tu navegador.
+          Para PDF, video, audio y Office analizamos el archivo y te indicamos el ajuste recomendado,
+          pero no modificamos esos formatos.
+        </p>
+        <div class="hero-stats" aria-label="Beneficios">
+          <div><strong>00</strong><span>SUBIDAS EXTERNAS</span></div>
+          <div><strong>03</strong><span>MODOS DE CALIDAD</span></div>
+          <div><strong>∞</strong><span>ARCHIVOS POR LOTE</span></div>
+        </div>
+      </section>
+
+      <section class="format-status" aria-label="Formatos compatibles">
+        <article class="format-card format-card-active">
+          <div class="format-state"><span></span> COMPRESIÓN REAL</div>
+          <h2>Imágenes</h2>
+          <p>Reducimos el peso, las dimensiones y generamos un archivo nuevo listo para descargar.</p>
+          <div class="format-tags"><span>JPG</span><span>JPEG</span><span>PNG</span><span>WEBP</span></div>
+        </article>
+        <article class="format-card">
+          <div class="format-state format-state-guide"><span></span> SOLO ANÁLISIS Y GUÍA</div>
+          <h2>Otros archivos</h2>
+          <p>Mostramos el tamaño objetivo y cómo exportarlo. El archivo original no se comprime ni cambia.</p>
+          <div class="format-tags muted-tags"><span>PDF</span><span>MP4</span><span>MP3</span><span>DOCX</span><span>PPTX</span><span>XLSX</span><span>ZIP</span></div>
+        </article>
+      </section>
+
+      <section class="workspace" aria-label="Compresor de archivos">
+        <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Seleccionar archivos">
+          <input id="fileInput" type="file" multiple hidden />
+          <div class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 44 44">
+              <path d="M13 33h18a8 8 0 0 0 1-15.9A11 11 0 0 0 11.4 14 9.5 9.5 0 0 0 13 33Z" />
+              <path d="m16 24 6-6 6 6M22 18v14" />
+            </svg>
+          </div>
+          <h2>Suelta tus archivos aquí</h2>
+          <p>o <span>elige desde tu dispositivo</span></p>
+          <small><strong>Comprime:</strong> JPG, PNG, WEBP &nbsp;·&nbsp; <strong>Solo analiza:</strong> PDF, video, audio y Office</small>
+        </div>
+
+        <div id="controls" class="controls" hidden>
+          <div class="control-heading">
+            <div>
+              <span class="section-kicker">AJUSTE DE IMÁGENES</span>
+              <h2>¿Para qué las necesitas?</h2>
+            </div>
+            <button id="addMoreBtn" class="text-button" type="button">+ Agregar más</button>
+          </div>
+
+          <div id="presetGroup" class="preset-grid" role="radiogroup" aria-label="Nivel de compresión">
+            <button class="preset" type="button" data-preset="light" role="radio" aria-checked="false">
+              <span class="preset-icon">◇</span>
+              <span><strong>Alta calidad</strong><small>Imprimir o archivar</small></span>
+              <b>90%</b>
+            </button>
+            <button class="preset active" type="button" data-preset="balanced" role="radio" aria-checked="true">
+              <span class="preset-icon">◐</span>
+              <span><strong>Equilibrado</strong><small>Web y uso diario</small></span>
+              <b>78%</b>
+            </button>
+            <button class="preset" type="button" data-preset="small" role="radio" aria-checked="false">
+              <span class="preset-icon">⌁</span>
+              <span><strong>Muy ligero</strong><small>Correo o mensajería</small></span>
+              <b>62%</b>
+            </button>
+          </div>
+
+          <div class="fine-tune">
+            <label for="qualityRange">Calidad personalizada</label>
+            <input id="qualityRange" type="range" min="45" max="95" value="78" />
+            <output id="qualityOutput" for="qualityRange">78%</output>
+          </div>
+        </div>
+
+        <div id="results" class="results" aria-live="polite"></div>
+
+        <div id="batchActions" class="batch-actions" hidden>
+          <div>
+            <span id="batchSummary">0 archivos listos</span>
+            <small id="batchSaved"></small>
+          </div>
+          <button id="downloadAllBtn" class="primary-button" type="button">
+            Descargar imágenes
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="guide">
+        <div>
+          <span class="section-kicker">RESULTADOS ESPERADOS</span>
+          <h2>¿Qué reduce<br />y cuánto?</h2>
+          <p>Estos son los rangos que la app usa como referencia. El resultado real depende del contenido y tamaño original.</p>
+        </div>
+        <div class="guide-list">
+          <article><span>01</span><div><h3>JPG / JPEG</h3><p>Sí se comprime · fotos y capturas sin transparencia</p></div><b>100–400 KB</b></article>
+          <article><span>02</span><div><h3>PNG</h3><p>Sí se comprime · se convierte a WEBP y conserva transparencia</p></div><b>100–600 KB</b></article>
+          <article><span>03</span><div><h3>WEBP</h3><p>Sí se comprime · reduce calidad y resolución si es necesario</p></div><b>80–350 KB</b></article>
+          <article><span>04</span><div><h3>PDF</h3><p>No se comprime · recomendamos resolución y tamaño objetivo</p></div><b>1–5 MB</b></article>
+          <article><span>05</span><div><h3>Video MP4 / MOV</h3><p>No se comprime · recomendamos resolución y bitrate</p></div><b>8–20 MB/MIN</b></article>
+          <article><span>06</span><div><h3>Audio MP3 / WAV</h3><p>No se comprime · recomendamos formato y bitrate</p></div><b>1–2 MB/MIN</b></article>
+          <article><span>07</span><div><h3>Word / PowerPoint / Excel</h3><p>No se comprime · indicamos cómo optimizar imágenes internas</p></div><b>MENOS DE 10 MB</b></article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#"><span>Reduce<span>Size</span></span></a>
+      <p>Tu archivo nunca sale de tu navegador.</p>
+    </footer>
+
+    <template id="resultTemplate">
+      <article class="file-card">
+        <div class="file-preview"></div>
+        <div class="file-info">
+          <div class="file-title-row">
+            <h3 class="file-name"></h3>
+            <button class="remove-button" type="button" aria-label="Quitar archivo">×</button>
+          </div>
+          <p class="file-meta"></p>
+          <div class="progress-track"><span></span></div>
+          <div class="file-status"></div>
+        </div>
+        <div class="file-action"></div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
