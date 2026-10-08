@@ -6,6 +6,8 @@ const ui = {
   applyTargetBtn: $('#applyTargetBtn'), stripMetadata: $('#stripMetadata'), addMoreBtn: $('#addMoreBtn'),
   resizePresetGroup: $('#resizePresetGroup'), manualResize: $('#manualResize'), resizeWidth: $('#resizeWidth'),
   resizeHeight: $('#resizeHeight'), applyResizeBtn: $('#applyResizeBtn'),
+  fileModeNotice: $('#fileModeNotice'), fileModeIcon: $('#fileModeIcon'), fileModeKicker: $('#fileModeKicker'),
+  fileModeTitle: $('#fileModeTitle'), fileModeText: $('#fileModeText'), noticeAddMoreBtn: $('#noticeAddMoreBtn'),
   processingSummary: $('#processingSummary'), batchActions: $('#batchActions'), batchSummary: $('#batchSummary'),
   batchSaved: $('#batchSaved'), downloadAllBtn: $('#downloadAllBtn'), downloadAllLabel: $('#downloadAllLabel'),
   mobileSaveHint: $('#mobileSaveHint'), compareModal: $('#compareModal'), compareTitle: $('#compareTitle'),
@@ -226,7 +228,7 @@ function updateCard(item) {
   if (!item.isImage) {
     progress.style.width = '100%';
     const advice = recommendationFor(item.file);
-    status.textContent = 'Análisis listo · no se modificó el archivo';
+    status.textContent = 'Solo análisis · no se puede redimensionar ni modificar aquí';
     const box = document.createElement('div'); box.className = 'recommendation';
     box.innerHTML = `<strong>${advice.title}</strong>${advice.detail}`; action.append(box); return;
   }
@@ -283,8 +285,28 @@ function removeItem(id) {
 
 function syncLayout() {
   const hasFiles = state.items.length > 0;
-  ui.controls.hidden = !hasFiles;
+  const imageCount = state.items.filter((item) => item.isImage).length;
+  const otherCount = state.items.length - imageCount;
+  ui.controls.hidden = imageCount === 0;
   ui.dropZone.style.display = hasFiles ? 'none' : '';
+  ui.fileModeNotice.hidden = otherCount === 0;
+  if (otherCount > 0 && imageCount === 0) {
+    ui.fileModeNotice.classList.remove('mixed');
+    ui.fileModeIcon.textContent = '!';
+    ui.fileModeKicker.textContent = 'SOLO ANÁLISIS Y GUÍA';
+    ui.fileModeTitle.textContent = otherCount === 1
+      ? 'Este archivo no se puede redimensionar ni comprimir aquí'
+      : 'Estos archivos no se pueden redimensionar ni comprimir aquí';
+    ui.fileModeText.textContent = 'Los controles de imágenes se ocultaron. Te mostraremos el tamaño recomendado y cómo exportar cada formato, sin modificar el original.';
+    ui.noticeAddMoreBtn.textContent = '+ Agregar imágenes';
+  } else if (otherCount > 0) {
+    ui.fileModeNotice.classList.add('mixed');
+    ui.fileModeIcon.textContent = 'i';
+    ui.fileModeKicker.textContent = 'LOTE MIXTO';
+    ui.fileModeTitle.textContent = `Los ajustes se aplican solo a ${imageCount} ${imageCount === 1 ? 'imagen' : 'imágenes'}`;
+    ui.fileModeText.textContent = `${otherCount} ${otherCount === 1 ? 'archivo adicional recibe' : 'archivos adicionales reciben'} únicamente análisis y recomendaciones; no se redimensionan ni se modifican.`;
+    ui.noticeAddMoreBtn.textContent = '+ Agregar más';
+  }
   updateBatch(); updateProcessingSummary();
 }
 function updateProcessingSummary() {
@@ -397,6 +419,7 @@ ui.dropZone.addEventListener('click', () => ui.fileInput.click());
 ui.dropZone.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ui.fileInput.click(); } });
 ui.fileInput.addEventListener('change', () => addFiles(ui.fileInput.files));
 ui.addMoreBtn.addEventListener('click', () => ui.fileInput.click());
+ui.noticeAddMoreBtn.addEventListener('click', () => ui.fileInput.click());
 ['dragenter', 'dragover'].forEach((type) => ui.dropZone.addEventListener(type, (event) => { event.preventDefault(); ui.dropZone.classList.add('dragging'); }));
 ['dragleave', 'drop'].forEach((type) => ui.dropZone.addEventListener(type, (event) => { event.preventDefault(); ui.dropZone.classList.remove('dragging'); }));
 ui.dropZone.addEventListener('drop', (event) => addFiles(event.dataTransfer.files));
