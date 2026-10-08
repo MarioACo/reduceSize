@@ -111,13 +111,18 @@
 
         <div id="results" class="results" aria-live="polite"></div>
 
+        <p id="mobileSaveHint" class="mobile-save-hint" hidden>
+          <strong>En iPhone o iPad:</strong> toca “Guardar / compartir” y elige
+          <b>Guardar en Archivos</b>, <b>Guardar imagen</b>, AirDrop u otra aplicación.
+        </p>
+
         <div id="batchActions" class="batch-actions" hidden>
           <div>
             <span id="batchSummary">0 archivos listos</span>
             <small id="batchSaved"></small>
           </div>
           <button id="downloadAllBtn" class="primary-button" type="button">
-            Descargar imágenes
+            <span id="downloadAllLabel">Descargar imágenes</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14" /></svg>
           </button>
         </div>

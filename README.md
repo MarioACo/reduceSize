@@ -13,6 +13,8 @@ Abre `index.html` en un navegador moderno. No necesita instalación, cuenta ni c
 - Redimensionado inteligente para evitar archivos enormes.
 - Comparación de tamaño original, tamaño final y ahorro total.
 - Descarga individual o de todas las imágenes procesadas.
+- En iPhone, iPad y Android usa el menú nativo para elegir Archivos, Fotos, AirDrop u otra aplicación.
+- Exportación alternativa para versiones de Safari que no admiten WEBP o `canvas.toBlob`.
 - Recomendaciones para PDF, video, audio, documentos y archivos comprimidos.
 - Procesamiento privado: los archivos no salen del dispositivo.
 

@@ -87,6 +87,17 @@ input[type="range"] { width: 100%; accent-color: var(--green); }
 .download-button { padding: 10px 13px; border: 1px solid var(--green); border-radius: 9px; background: transparent; color: var(--green); font-size: 11px; font-weight: 800; cursor: pointer; }
 .recommendation { max-width: 200px; color: var(--muted); font-size: 10px; line-height: 1.45; }
 .recommendation strong { display: block; margin-bottom: 2px; color: var(--ink); font-size: 11px; }
+.mobile-save-hint {
+  margin: 14px 0 0;
+  padding: 13px 15px;
+  border: 1px solid rgba(66,217,255,.24);
+  border-radius: 5px;
+  color: #9fb5ad;
+  background: rgba(66,217,255,.045);
+  font: 11px/1.55 Consolas, "Courier New", monospace;
+}
+.mobile-save-hint strong { color: var(--cyan); }
+.mobile-save-hint b { color: #d8fff1; }
 .batch-actions { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; border-radius: 16px; color: white; background: var(--green-dark); }
 .batch-actions span, .batch-actions small { display: block; }
 .batch-actions span { font-family: Georgia, serif; font-size: 19px; }
@@ -119,6 +130,7 @@ footer { min-height: 105px; display: flex; align-items: center; justify-content:
   .file-card { grid-template-columns: 58px minmax(0, 1fr); }
   .file-preview { width: 58px; height: 54px; }
   .file-action { grid-column: 2; text-align: left; }
+  .download-button { min-height: 44px; padding-inline: 15px; }
   .recommendation { max-width: none; }
   .batch-actions { align-items: flex-start; gap: 20px; flex-direction: column; }
   .guide { grid-template-columns: 1fr; gap: 40px; padding: 0 8px 80px; }

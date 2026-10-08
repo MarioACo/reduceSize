@@ -11,9 +11,27 @@ const batchActions = document.querySelector('#batchActions');
 const batchSummary = document.querySelector('#batchSummary');
 const batchSaved = document.querySelector('#batchSaved');
 const downloadAllBtn = document.querySelector('#downloadAllBtn');
+const downloadAllLabel = document.querySelector('#downloadAllLabel');
+const mobileSaveHint = document.querySelector('#mobileSaveHint');
 
 const state = { items: [], quality: 0.78, revision: 0 };
 const presets = { light: 0.9, balanced: 0.78, small: 0.62 };
+const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isTouchDevice = window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+const supportsWebP = (() => {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    return canvas.toDataURL('image/webp').startsWith('data:image/webp');
+  } catch {
+    return false;
+  }
+})();
+
+mobileSaveHint.hidden = !isTouchDevice;
+if (isTouchDevice) downloadAllLabel.textContent = 'Guardar / compartir';
 
 const formatBytes = (bytes) => {
   if (!Number.isFinite(bytes) || bytes === 0) return '0 B';
@@ -49,8 +67,10 @@ function recommendationFor(file) {
 
 function outputSettings(file) {
   const transparent = file.type === 'image/png';
-  const outputType = transparent ? 'image/webp' : (file.type === 'image/webp' ? 'image/webp' : 'image/jpeg');
-  const outputExt = outputType === 'image/webp' ? 'webp' : 'jpg';
+  let outputType = 'image/jpeg';
+  if (supportsWebP && (transparent || file.type === 'image/webp')) outputType = 'image/webp';
+  if (!supportsWebP && transparent) outputType = 'image/png';
+  const outputExt = outputType === 'image/webp' ? 'webp' : outputType === 'image/png' ? 'png' : 'jpg';
   return { outputType, outputExt };
 }
 
@@ -65,11 +85,26 @@ function loadImage(file) {
 }
 
 function canvasToBlob(canvas, type, quality) {
-  return new Promise((resolve, reject) => canvas.toBlob(
-    (blob) => blob ? resolve(blob) : reject(new Error('Este formato no se pudo exportar')),
-    type,
-    quality,
-  ));
+  return new Promise((resolve, reject) => {
+    if (typeof canvas.toBlob !== 'function') {
+      try {
+        const dataUrl = canvas.toDataURL(type, quality);
+        const parts = dataUrl.split(',');
+        const binary = atob(parts[1]);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        resolve(new Blob([bytes], { type: parts[0].match(/:(.*?);/)[1] }));
+      } catch (error) {
+        reject(error);
+      }
+      return;
+    }
+    canvas.toBlob(
+      (blob) => blob ? resolve(blob) : reject(new Error('Safari no pudo exportar este formato')),
+      type,
+      quality,
+    );
+  });
 }
 
 async function compressImage(item, revision) {
@@ -143,8 +178,8 @@ function updateCard(item) {
     const button = document.createElement('button');
     button.className = 'download-button';
     button.type = 'button';
-    button.textContent = 'Descargar';
-    button.addEventListener('click', () => downloadItem(item));
+    button.textContent = isTouchDevice ? 'Guardar / compartir' : 'Descargar';
+    button.addEventListener('click', () => saveItem(item));
     action.append(button);
   } else {
     progress.style.width = '100%';
@@ -208,12 +243,54 @@ function updateBatch() {
   batchSaved.textContent = `Ahorro total: ${formatBytes(saved)} (${percent}%)`;
 }
 
+function downloadableFile(item) {
+  try {
+    return new File([item.blob], item.outputName, { type: item.blob.type || 'application/octet-stream' });
+  } catch {
+    return item.blob;
+  }
+}
+
+function canShareFiles(files) {
+  if (!navigator.share || !navigator.canShare) return false;
+  try {
+    return navigator.canShare({ files });
+  } catch {
+    return false;
+  }
+}
+
 function downloadItem(item) {
   if (!item.outputUrl) return;
   const link = document.createElement('a');
   link.href = item.outputUrl;
   link.download = item.outputName;
+  link.rel = 'noopener';
+  document.body.append(link);
   link.click();
+  link.remove();
+}
+
+async function saveItem(item) {
+  if (!item.outputUrl || !item.blob) return;
+  const file = downloadableFile(item);
+  if (file instanceof File && canShareFiles([file])) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: item.outputName,
+        text: 'Imagen reducida con ReduceSize',
+      });
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+    }
+  }
+  if (isAppleMobile) {
+    const opened = window.open(item.outputUrl, '_blank', 'noopener');
+    if (opened) return;
+  }
+  downloadItem(item);
 }
 
 function recompressAll() {
@@ -272,8 +349,25 @@ qualityRange.addEventListener('change', recompressAll);
 
 downloadAllBtn.addEventListener('click', async () => {
   const images = state.items.filter((item) => item.isImage && item.blob);
+  const files = images.map(downloadableFile).filter((file) => file instanceof File);
+  if (files.length && files.length === images.length && canShareFiles(files)) {
+    try {
+      await navigator.share({
+        files,
+        title: 'Imágenes reducidas',
+        text: `${files.length} ${files.length === 1 ? 'imagen reducida' : 'imágenes reducidas'} con ReduceSize`,
+      });
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+    }
+  }
   for (const item of images) {
-    downloadItem(item);
+    if (isAppleMobile) {
+      await saveItem(item);
+    } else {
+      downloadItem(item);
+    }
     await new Promise((resolve) => setTimeout(resolve, 180));
   }
 });
