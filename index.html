@@ -33,15 +33,14 @@
     <main>
       <section class="hero">
         <div class="eyebrow"><span></span> SISTEMA DE COMPRESIÓN // ONLINE <span></span></div>
-        <h1>Archivos más ligeros.<br /><em>Calidad que se queda.</em></h1>
+        <h1>El peso exacto.<br /><em>Calidad que se queda.</em></h1>
         <p class="hero-copy">
-          Reduce el peso de imágenes <strong>JPG, PNG y WEBP</strong> directamente en tu navegador.
-          Para PDF, video, audio y Office analizamos el archivo y te indicamos el ajuste recomendado,
-          pero no modificamos esos formatos.
+          Dinos dónde usarás la imagen o cuánto debe pesar. ReduceSize encuentra automáticamente
+          el mejor resultado para <strong>JPG, PNG, WEBP y HEIC</strong>, elimina datos privados y te deja comparar antes de guardar.
         </p>
         <div class="hero-stats" aria-label="Beneficios">
           <div><strong>00</strong><span>SUBIDAS EXTERNAS</span></div>
-          <div><strong>03</strong><span>MODOS DE CALIDAD</span></div>
+          <div><strong>04</strong><span>DESTINOS INTELIGENTES</span></div>
           <div><strong>∞</strong><span>ARCHIVOS POR LOTE</span></div>
         </div>
       </section>
@@ -51,7 +50,8 @@
           <div class="format-state"><span></span> COMPRESIÓN REAL</div>
           <h2>Imágenes</h2>
           <p>Reducimos el peso, las dimensiones y generamos un archivo nuevo listo para descargar.</p>
-          <div class="format-tags"><span>JPG</span><span>JPEG</span><span>PNG</span><span>WEBP</span></div>
+          <div class="format-tags"><span>JPG</span><span>JPEG</span><span>PNG</span><span>WEBP</span><span>HEIC*</span></div>
+          <small class="format-note">* HEIC funciona cuando el navegador puede abrirlo, especialmente Safari en dispositivos Apple.</small>
         </article>
         <article class="format-card">
           <div class="format-state format-state-guide"><span></span> SOLO ANÁLISIS Y GUÍA</div>
@@ -72,52 +72,138 @@
           </div>
           <h2>Suelta tus archivos aquí</h2>
           <p>o <span>elige desde tu dispositivo</span></p>
-          <small><strong>Comprime:</strong> JPG, PNG, WEBP &nbsp;·&nbsp; <strong>Solo analiza:</strong> PDF, video, audio y Office</small>
+          <small><strong>Comprime:</strong> JPG, PNG, WEBP y HEIC* &nbsp;·&nbsp; <strong>Solo analiza:</strong> PDF, video, audio y Office</small>
         </div>
 
         <div id="controls" class="controls" hidden>
           <div class="control-heading">
             <div>
-              <span class="section-kicker">AJUSTE DE IMÁGENES</span>
-              <h2>¿Para qué las necesitas?</h2>
+              <span class="step-number">PASO 01</span>
+              <span class="section-kicker">ELIGE EL DESTINO</span>
+              <h2>¿Dónde vas a usar las imágenes?</h2>
+              <p>Nosotros elegimos el peso, formato y resolución adecuados.</p>
             </div>
             <button id="addMoreBtn" class="text-button" type="button">+ Agregar más</button>
           </div>
 
-          <div id="presetGroup" class="preset-grid" role="radiogroup" aria-label="Nivel de compresión">
-            <button class="preset" type="button" data-preset="light" role="radio" aria-checked="false">
-              <span class="preset-icon">◇</span>
-              <span><strong>Alta calidad</strong><small>Imprimir o archivar</small></span>
-              <b>90%</b>
+          <div id="presetGroup" class="preset-grid destination-grid" role="radiogroup" aria-label="Destino de las imágenes">
+            <button class="preset active" type="button" data-preset="whatsapp" role="radio" aria-checked="true">
+              <span class="preset-icon">01</span>
+              <span><strong>WhatsApp y redes</strong><small>Rápida de enviar y se ve bien</small></span>
+              <b>&lt; 350 KB</b>
             </button>
-            <button class="preset active" type="button" data-preset="balanced" role="radio" aria-checked="true">
-              <span class="preset-icon">◐</span>
-              <span><strong>Equilibrado</strong><small>Web y uso diario</small></span>
-              <b>78%</b>
+            <button class="preset" type="button" data-preset="email" role="radio" aria-checked="false">
+              <span class="preset-icon">02</span>
+              <span><strong>Correo o trámite</strong><small>Documentos y formularios</small></span>
+              <b>&lt; 1 MB</b>
             </button>
-            <button class="preset" type="button" data-preset="small" role="radio" aria-checked="false">
-              <span class="preset-icon">⌁</span>
-              <span><strong>Muy ligero</strong><small>Correo o mensajería</small></span>
-              <b>62%</b>
+            <button class="preset" type="button" data-preset="web" role="radio" aria-checked="false">
+              <span class="preset-icon">03</span>
+              <span><strong>Web o tienda</strong><small>Carga rápida y buena nitidez</small></span>
+              <b>&lt; 250 KB</b>
+            </button>
+            <button class="preset" type="button" data-preset="print" role="radio" aria-checked="false">
+              <span class="preset-icon">04</span>
+              <span><strong>Imprimir</strong><small>Conserva resolución y detalle</small></span>
+              <b>&lt; 4 MB</b>
             </button>
           </div>
 
-          <div class="fine-tune">
-            <label for="qualityRange">Calidad personalizada</label>
-            <input id="qualityRange" type="range" min="45" max="95" value="78" />
-            <output id="qualityOutput" for="qualityRange">78%</output>
+          <div class="target-panel">
+            <div>
+              <span class="target-label">¿TIENES UN LÍMITE EXACTO?</span>
+              <p>Escribe el máximo permitido por tu portal o aplicación.</p>
+            </div>
+            <div class="target-inputs">
+              <label class="sr-only" for="targetSize">Peso máximo</label>
+              <input id="targetSize" type="number" min="20" step="10" value="350" inputmode="decimal" />
+              <select id="targetUnit" aria-label="Unidad del peso máximo">
+                <option value="KB">KB</option>
+                <option value="MB">MB</option>
+              </select>
+              <button id="applyTargetBtn" type="button">Aplicar objetivo</button>
+            </div>
           </div>
+
+          <div class="resize-panel">
+            <div class="resize-heading">
+              <div>
+                <span class="target-label">¿TAMBIÉN NECESITAS CAMBIAR LAS MEDIDAS?</span>
+                <p>Elige para qué la usarás. Nunca estiramos la imagen ni deformamos sus proporciones.</p>
+              </div>
+              <span class="recommended-chip">AUTO RECOMENDADO</span>
+            </div>
+            <div id="resizePresetGroup" class="resize-presets" role="radiogroup" aria-label="Tamaño de la imagen">
+              <button class="resize-preset active" type="button" data-resize="auto" role="radio" aria-checked="true">
+                <strong>Automático</strong><small>La mejor medida para el peso elegido</small>
+              </button>
+              <button class="resize-preset" type="button" data-resize="social" role="radio" aria-checked="false">
+                <strong>Redes sociales</strong><small>Lado largo hasta 1080 px</small>
+              </button>
+              <button class="resize-preset" type="button" data-resize="email" role="radio" aria-checked="false">
+                <strong>Correo y trámites</strong><small>Lado largo hasta 1600 px</small>
+              </button>
+              <button class="resize-preset" type="button" data-resize="web" role="radio" aria-checked="false">
+                <strong>Web y tienda</strong><small>Lado largo hasta 1920 px</small>
+              </button>
+              <button class="resize-preset" type="button" data-resize="original" role="radio" aria-checked="false">
+                <strong>Medidas originales</strong><small>Solo reduce el peso</small>
+              </button>
+              <button class="resize-preset" type="button" data-resize="manual" role="radio" aria-checked="false">
+                <strong>Medidas manuales</strong><small>Define ancho y alto máximos</small>
+              </button>
+            </div>
+            <div id="manualResize" class="manual-resize" hidden>
+              <div>
+                <label for="resizeWidth">Ancho máximo</label>
+                <div class="dimension-input"><input id="resizeWidth" type="number" min="100" max="10000" value="1200" inputmode="numeric" /><span>PX</span></div>
+              </div>
+              <span class="dimension-lock" aria-label="La proporción se mantiene">🔗</span>
+              <div>
+                <label for="resizeHeight">Alto máximo</label>
+                <div class="dimension-input"><input id="resizeHeight" type="number" min="100" max="10000" value="1200" inputmode="numeric" /><span>PX</span></div>
+              </div>
+              <button id="applyResizeBtn" type="button">Aplicar medidas</button>
+              <p>La imagen cabrá dentro de estas medidas sin recortarse ni deformarse.</p>
+            </div>
+          </div>
+
+          <details class="advanced-settings">
+            <summary>Ajustes avanzados <span>Opcional</span></summary>
+            <div class="advanced-content">
+              <div class="fine-tune">
+                <label for="qualityRange">Prioridad de calidad</label>
+                <input id="qualityRange" type="range" min="55" max="95" value="78" />
+                <output id="qualityOutput" for="qualityRange">78%</output>
+              </div>
+              <label class="privacy-toggle" for="stripMetadata">
+                <span>
+                  <strong>Eliminar datos privados</strong>
+                  <small>Borra GPS, fecha, cámara y otros metadatos al crear la nueva imagen.</small>
+                </span>
+                <input id="stripMetadata" type="checkbox" checked />
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+          </details>
+        </div>
+
+        <div id="processingSummary" class="processing-summary" hidden>
+          <span class="step-number">PASO 02</span>
+          <div><strong>Optimización inteligente</strong><small>Buscando el mejor equilibrio para cada imagen…</small></div>
+          <span class="processing-pulse" aria-hidden="true"></span>
         </div>
 
         <div id="results" class="results" aria-live="polite"></div>
 
         <p id="mobileSaveHint" class="mobile-save-hint" hidden>
-          <strong>En iPhone o iPad:</strong> toca “Guardar / compartir” y elige
-          <b>Guardar en Archivos</b>, <b>Guardar imagen</b>, AirDrop u otra aplicación.
+          <strong>¿Dónde se guarda?</strong> En iPhone y iPad llegará directamente a
+          <b>Archivos → Descargas</b>. En Android se abrirá el selector de ubicación cuando el navegador lo permita.
         </p>
 
         <div id="batchActions" class="batch-actions" hidden>
           <div>
+            <small class="batch-step">PASO 03 · RESULTADO</small>
             <span id="batchSummary">0 archivos listos</span>
             <small id="batchSaved"></small>
           </div>
@@ -167,6 +253,29 @@
       </article>
     </template>
 
-    <script src="app.js"></script>
+    <div id="compareModal" class="compare-modal" hidden role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+      <div class="compare-backdrop" data-close-compare></div>
+      <section class="compare-panel">
+        <button class="compare-close" type="button" data-close-compare aria-label="Cerrar comparación">×</button>
+        <span class="section-kicker">COMPARACIÓN VISUAL</span>
+        <h2 id="compareTitle">Antes y después</h2>
+        <p id="compareDescription">Mueve el control para revisar la pérdida de detalle.</p>
+        <div id="compareStage" class="compare-stage">
+          <img id="compareBefore" src="" alt="Imagen original" />
+          <img id="compareAfter" src="" alt="Imagen comprimida" />
+          <span class="compare-divider" aria-hidden="true"></span>
+          <span class="compare-tag before-tag">ORIGINAL</span>
+          <span class="compare-tag after-tag">REDUCIDA</span>
+        </div>
+        <label class="compare-control" for="compareRange">
+          <span>Original</span>
+          <input id="compareRange" type="range" min="0" max="100" value="50" />
+          <span>Reducida</span>
+        </label>
+        <div id="compareStats" class="compare-stats"></div>
+      </section>
+    </div>
+
+    <script src="app-v2.js"></script>
   </body>
 </html>

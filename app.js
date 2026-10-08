@@ -31,7 +31,7 @@ const supportsWebP = (() => {
 })();
 
 mobileSaveHint.hidden = !isTouchDevice;
-if (isTouchDevice) downloadAllLabel.textContent = 'Guardar / compartir';
+if (isTouchDevice) downloadAllLabel.textContent = 'Guardar archivos';
 
 const formatBytes = (bytes) => {
   if (!Number.isFinite(bytes) || bytes === 0) return '0 B';
@@ -178,7 +178,7 @@ function updateCard(item) {
     const button = document.createElement('button');
     button.className = 'download-button';
     button.type = 'button';
-    button.textContent = isTouchDevice ? 'Guardar / compartir' : 'Descargar';
+    button.textContent = isTouchDevice ? 'Guardar archivo' : 'Descargar';
     button.addEventListener('click', () => saveItem(item));
     action.append(button);
   } else {
@@ -243,23 +243,6 @@ function updateBatch() {
   batchSaved.textContent = `Ahorro total: ${formatBytes(saved)} (${percent}%)`;
 }
 
-function downloadableFile(item) {
-  try {
-    return new File([item.blob], item.outputName, { type: item.blob.type || 'application/octet-stream' });
-  } catch {
-    return item.blob;
-  }
-}
-
-function canShareFiles(files) {
-  if (!navigator.share || !navigator.canShare) return false;
-  try {
-    return navigator.canShare({ files });
-  } catch {
-    return false;
-  }
-}
-
 function downloadItem(item) {
   if (!item.outputUrl) return;
   const link = document.createElement('a');
@@ -273,24 +256,35 @@ function downloadItem(item) {
 
 async function saveItem(item) {
   if (!item.outputUrl || !item.blob) return;
-  const file = downloadableFile(item);
-  if (file instanceof File && canShareFiles([file])) {
+  if (typeof window.showSaveFilePicker === 'function') {
     try {
-      await navigator.share({
-        files: [file],
-        title: item.outputName,
-        text: 'Imagen reducida con ReduceSize',
+      const extension = item.outputName.split('.').pop()?.toLowerCase() || 'jpg';
+      const mimeType = item.blob.type || 'image/jpeg';
+      const handle = await window.showSaveFilePicker({
+        suggestedName: item.outputName,
+        types: [{
+          description: 'Imagen reducida',
+          accept: { [mimeType]: [`.${extension}`] },
+        }],
       });
+      const writable = await handle.createWritable();
+      await writable.write(item.blob);
+      await writable.close();
+      mobileSaveHint.hidden = false;
+      mobileSaveHint.innerHTML = '<strong>Archivo guardado.</strong> Se guardó en la ubicación que elegiste.';
       return;
     } catch (error) {
       if (error?.name === 'AbortError') return;
     }
   }
-  if (isAppleMobile) {
-    const opened = window.open(item.outputUrl, '_blank', 'noopener');
-    if (opened) return;
-  }
   downloadItem(item);
+  if (isAppleMobile) {
+    mobileSaveHint.hidden = false;
+    mobileSaveHint.innerHTML = '<strong>Descarga iniciada.</strong> Encuentra la imagen en <b>Archivos → Descargas</b> de tu iPhone o iPad.';
+  } else if (isTouchDevice) {
+    mobileSaveHint.hidden = false;
+    mobileSaveHint.innerHTML = '<strong>Descarga iniciada.</strong> Revisa la carpeta <b>Descargas</b> de tu dispositivo.';
+  }
 }
 
 function recompressAll() {
@@ -349,26 +343,17 @@ qualityRange.addEventListener('change', recompressAll);
 
 downloadAllBtn.addEventListener('click', async () => {
   const images = state.items.filter((item) => item.isImage && item.blob);
-  const files = images.map(downloadableFile).filter((file) => file instanceof File);
-  if (files.length && files.length === images.length && canShareFiles(files)) {
-    try {
-      await navigator.share({
-        files,
-        title: 'Imágenes reducidas',
-        text: `${files.length} ${files.length === 1 ? 'imagen reducida' : 'imágenes reducidas'} con ReduceSize`,
-      });
-      return;
-    } catch (error) {
-      if (error?.name === 'AbortError') return;
-    }
-  }
+  if (images.length === 1) return saveItem(images[0]);
   for (const item of images) {
-    if (isAppleMobile) {
-      await saveItem(item);
-    } else {
-      downloadItem(item);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 180));
+    downloadItem(item);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  if (isAppleMobile) {
+    mobileSaveHint.hidden = false;
+    mobileSaveHint.innerHTML = `<strong>${images.length} descargas iniciadas.</strong> Safari puede pedir permiso para descargar varios archivos. Búscalos en <b>Archivos → Descargas</b>.`;
+  } else if (isTouchDevice) {
+    mobileSaveHint.hidden = false;
+    mobileSaveHint.innerHTML = `<strong>${images.length} descargas iniciadas.</strong> Revisa la carpeta <b>Descargas</b> de tu dispositivo.`;
   }
 });
 
